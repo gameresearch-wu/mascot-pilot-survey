@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบสอบถามคุณลักษณะภาพมาสคอต</title>
+<style>
+  :root{
+    --ink:#1c2b2a; --sea:#0f6e6a; --sea-soft:#e3f0ef;
+    --sand:#faf7f0; --line:#d8cfc0; --coral:#d76a4a;
+    --muted:#6b7873; --white:#fff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--sand); color:var(--ink);
+    font-family:"Sarabun","Noto Sans Thai",system-ui,sans-serif;
+    line-height:1.5; font-size:16px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 18px 60px}
+  header.top{border-bottom:2px solid var(--sea);padding-bottom:14px;margin-bottom:18px}
+  header.top h1{font-size:1.25rem;margin:0 0 4px;color:var(--sea)}
+  header.top p{margin:0;color:var(--muted);font-size:.9rem}
+  .badge{display:inline-block;margin-top:8px;background:var(--sea-soft);color:var(--sea);
+    font-weight:600;padding:3px 12px;border-radius:20px;font-size:.82rem}
+  .intro-card,.card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:20px}
+  label.fld{display:block;font-weight:600;margin-bottom:6px;font-size:.95rem}
+  input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit}
+  .btn{background:var(--sea);color:#fff;border:none;padding:13px 26px;font:inherit;
+    font-weight:700;border-radius:10px;cursor:pointer;font-size:1rem}
+  .btn:hover{background:#0b5854}
+  .btn:disabled{background:#a9bdbb;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--sea);border:1px solid var(--sea)}
+  .btn.ghost:hover{background:var(--sea-soft)}
+  .actions{display:flex;gap:12px;flex-wrap:wrap}
+
+  /* progress */
+  .progress{font-size:.85rem;color:var(--muted);margin-bottom:14px}
+  .bar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}
+  .bar>i{display:block;height:100%;background:var(--sea);width:0;transition:.25s}
+
+  /* two-column split */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .col-q{min-width:0}
+  .col-img{position:sticky;top:16px}
+  .mascot-num{font-size:.8rem;color:var(--muted);font-weight:600;letter-spacing:.05em;
+    text-transform:uppercase;margin-bottom:8px}
+  .mascot-img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#f0ebe0;
+    border:1px dashed var(--line);border-radius:12px;display:flex;align-items:center;
+    justify-content:center;color:var(--muted);font-size:1.5rem}
+
+  /* linear scale */
+  .q{margin-bottom:26px}
+  .q .qtitle{font-weight:600;margin-bottom:2px}
+  .q .qsub{color:var(--muted);font-size:.9rem;margin-bottom:12px}
+  .lin{display:flex;gap:6px}
+  .lin .cell{flex:1;text-align:center}
+  .lin .cell input{display:none}
+  .lin .cell label{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    padding:10px 4px;border:1px solid var(--line);border-radius:8px;cursor:pointer;
+    height:100%;transition:.12s;background:#fff
+  }
+  .lin .cell label:hover{border-color:var(--sea)}
+  .lin .cell .dot{font-weight:700;color:var(--sea);font-size:1.05rem}
+  .lin .cell .cap{font-size:.72rem;color:var(--muted);line-height:1.25}
+  .lin .cell input:checked + label{background:var(--sea-soft);border-color:var(--sea);border-width:2px}
+  .lin .cell input:checked + label .cap{color:var(--ink)}
+
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:8px}
+  .warn{color:var(--coral);font-size:.85rem;margin-top:10px;min-height:1.2em}
+  .hidden{display:none}
+  .done{text-align:center;padding:40px 20px}
+  .done h2{color:var(--sea)}
+  footer.note{color:var(--muted);font-size:.8rem;text-align:center;margin-top:26px}
+
+  @media(max-width:760px){
+    .split{grid-template-columns:1fr}
+    .col-img{position:static;order:-1;margin-bottom:6px}
+    .mascot-img{max-height:260px}
+    .lin{gap:4px}
+    .lin .cell label{padding:8px 2px}
+    .lin .cell .cap{font-size:.62rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>แบบสอบถามคุณลักษณะภาพมาสคอต</h1>
+    <p>การทดลองเบื้องต้นเพื่อตรวจสอบคุณลักษณะของภาพมาสคอตก่อนนำไปใช้ในการทดลองหลัก</p>
+    <span class="badge" id="blockBadge"></span>
+  </header>
+
+  <!-- INTRO -->
+  <section id="intro">
+    <div class="intro-card">
+      <p>ท่านจะได้ดูภาพมาสคอตทั้งหมด <strong>14 ภาพ</strong> และตอบคำถาม <strong>3 ข้อ</strong> ต่อ 1 ภาพ
+      ระบบจะสุ่มชุดคำถามให้ท่านโดยอัตโนมัติเพื่อลดความเหนื่อยล้าในการตอบ</p>
+      <p style="color:var(--muted);font-size:.9rem">ไม่มีคำตอบถูกหรือผิด กรุณาตอบตามความรู้สึกแรกของท่าน</p>
+      <label class="fld" for="pid" style="margin-top:14px">รหัส/ชื่อผู้เข้าร่วม (ไม่บังคับ)</label>
+      <input type="text" id="pid" placeholder="เช่น P01 หรือเว้นว่างไว้">
+      <div class="actions" style="margin-top:18px">
+        <button class="btn" onclick="startSurvey()">เริ่มทำแบบสอบถาม</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SURVEY -->
+  <section id="survey" class="hidden">
+    <div class="progress">
+      <span id="progText"></span>
+      <div class="bar"><i id="progBar"></i></div>
+    </div>
+    <div class="card">
+      <div class="split">
+        <div class="col-img">
+          <div class="mascot-num" id="mascotNum"></div>
+          <div id="imgSlot"></div>
+        </div>
+        <div class="col-q">
+          <div id="questions"></div>
+          <div class="warn" id="warn"></div>
+          <div class="nav">
+            <button class="btn ghost" id="prevBtn" onclick="prev()">ย้อนกลับ</button>
+            <button class="btn" id="nextBtn" onclick="next()">ถัดไป</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section id="done" class="hidden">
+    <div class="card done">
+      <h2>ขอบคุณสำหรับการตอบแบบสอบถาม</h2>
+      <p>คำตอบของท่านถูกบันทึกเรียบร้อยแล้ว</p>
+      <div class="actions" style="justify-content:center">
+        <button class="btn" onclick="downloadCSV()">ดาวน์โหลดไฟล์ CSV</button>
+        <button class="btn ghost" onclick="location.reload()">เริ่มผู้ตอบคนใหม่</button>
+      </div>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:18px">
+        กรุณากดดาวน์โหลด CSV แล้วส่งไฟล์ให้ผู้วิจัย</p>
+    </div>
+  </section>
+
+  <footer class="note">การทดลองเบื้องต้น (Pilot Study) · ภาพมาสคอต 14 ภาพ · 3 บล็อกคำถาม</footer>
+</div>
+
+<script>
+/* ==========================================================================
+   รูปมาสคอต 14 ภาพ — วางไฟล์ไว้ในโฟลเดอร์ images/ ชื่อ 01.png ถึง 14.png
+   ถ้าต้องการใช้นามสกุลอื่น (.jpg/.webp) แก้ .png ด้านล่างให้ตรงกัน
+   ถ้ายังไม่มีรูป ระบบจะแสดงช่อง "ภาพมาสคอต N" แทนโดยอัตโนมัติ
+   ========================================================================== */
+const MASCOTS = Array.from({length:14}, (_,i)=>{
+  const n = String(i+1).padStart(2,"0");   // 01, 02, ... 14
+  return `images/${n}.png`;
+});
+
+/* ---- ชุดคำถาม 3 บล็อก ---- */
+const BLOCKS = {
+  1: [
+    {key:"beauty", title:"ความสวยงามและน่าดึงดูด", sub:"มาสคอตตัวนี้ดูสวยงามและน่าดึงดูดเพียงใด",
+      opts:["ไม่สวยงามและไม่น่าดึงดูดเลย","เล็กน้อย","ปานกลาง","ค่อนข้างมาก","สวยงามและน่าดึงดูดมาก"]},
+    {key:"cute", title:"ความน่ารัก", sub:"มาสคอตตัวนี้ดูน่ารักเพียงใด",
+      opts:["ไม่น่ารักเลย","น่ารักเล็กน้อย","ปานกลาง","ค่อนข้างน่ารัก","น่ารักมาก"]},
+    {key:"complexity", title:"ความซับซ้อนของรูปลักษณ์", sub:"รูปลักษณ์ของมาสคอตตัวนี้ดูเรียบง่ายหรือซับซ้อนเพียงใด",
+      opts:["เรียบง่ายมาก","ค่อนข้างเรียบง่าย","ปานกลาง","ค่อนข้างซับซ้อน","ซับซ้อนมาก"]}
+  ],
+  2: [
+    {key:"professional", title:"ความเป็นมืออาชีพ", sub:"มาสคอตตัวนี้ดูเป็นผลงานที่ออกแบบและผลิตอย่างเป็นมืออาชีพเพียงใด",
+      opts:["ไม่เป็นมืออาชีพเลย","เป็นมืออาชีพเล็กน้อย","ปานกลาง","ค่อนข้างเป็นมืออาชีพ","เป็นมืออาชีพมาก"]},
+    {key:"distinctive", title:"ความมีเอกลักษณ์", sub:"มาสคอตตัวนี้ดูแตกต่างจากมาสคอตทั่วไปเพียงใด",
+      opts:["ไม่แตกต่างเลย","แตกต่างเล็กน้อย","ปานกลาง","ค่อนข้างแตกต่าง","แตกต่างมาก"]},
+    {key:"familiar", title:"ความคุ้นเคย", sub:"รูปลักษณ์ของมาสคอตตัวนี้ดูคุ้นเคยสำหรับท่านเพียงใด",
+      opts:["ไม่คุ้นเคยเลย","คุ้นเคยเล็กน้อย","ปานกลาง","ค่อนข้างคุ้นเคย","คุ้นเคยมาก"]}
+  ],
+  3: [
+    {key:"cultural", title:"ความเชื่อมโยงกับวัฒนธรรมท้องถิ่น", sub:"มาสคอตตัวนี้ดูเชื่อมโยงกับวัฒนธรรมหรือเอกลักษณ์ของท้องถิ่นเพียงใด",
+      opts:["ไม่เชื่อมโยงเลย","เชื่อมโยงเล็กน้อย","ปานกลาง","ค่อนข้างเชื่อมโยง","เชื่อมโยงอย่างชัดเจนมาก"]},
+    {key:"storytelling", title:"การสื่อข้อมูลและเรื่องราว", sub:"มาสคอตตัวนี้มีรายละเอียดหรือสัญลักษณ์ที่สื่อถึงสถานที่หรือวัฒนธรรมมากน้อยเพียงใด",
+      opts:["ไม่มีเลย","มีเล็กน้อย","ปานกลาง","มีค่อนข้างมาก","มีมากและเห็นได้ชัดเจน"]},
+    {key:"overall", title:"ความชอบโดยรวม", sub:"โดยรวมแล้ว ท่านชอบมาสคอตตัวนี้เพียงใด",
+      opts:["ไม่ชอบเลย","ชอบเล็กน้อย","ปานกลาง","ค่อนข้างชอบ","ชอบมาก"]}
+  ]
+};
+
+let assignedBlock, pid = "", current = 0;   // current = index ภาพ 0–13
+const answers = {};                          // answers[mascotNo][key] = value
+
+function startSurvey(){
+  pid = document.getElementById('pid').value.trim();
+  assignedBlock = Math.floor(Math.random()*3)+1;
+  document.getElementById('blockBadge').textContent = "ชุดคำถาม (บล็อก) " + assignedBlock;
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('survey').classList.remove('hidden');
+  current = 0;
+  renderMascot();
+  window.scrollTo(0,0);
+}
+
+function renderMascot(){
+  const num = current+1;
+  const qs = BLOCKS[assignedBlock];
+
+  // image (right)
+  document.getElementById('mascotNum').textContent = `มาสคอต ${num} / 14`;
+  document.getElementById('imgSlot').innerHTML = MASCOTS[current]
+    ? `<img class="mascot-img" src="${MASCOTS[current]}" alt="มาสคอต ${num}"
+         onerror="this.outerHTML='<div class=\\'mascot-img\\'>ภาพมาสคอต ${num}</div>'">`
+    : `<div class="mascot-img">ภาพมาสคอต ${num}</div>`;
+
+  // questions (left) — linear scale
+  let html = "";
+  qs.forEach(q=>{
+    const saved = (answers[num] && answers[num][q.key]) || null;
+    let cells = "";
+    q.opts.forEach((label,i)=>{
+      const val=i+1, id=`q_${q.key}_${val}`;
+      cells += `
+        <div class="cell">
+          <input type="radio" name="${q.key}" id="${id}" value="${val}"
+            ${saved==val?'checked':''} onchange="save('${q.key}',${val})">
+          <label for="${id}"><span class="dot">${val}</span><span class="cap">${label}</span></label>
+        </div>`;
+    });
+    html += `<div class="q"><div class="qtitle">${q.title}</div>
+      <div class="qsub">${q.sub}</div><div class="lin">${cells}</div></div>`;
+  });
+  document.getElementById('questions').innerHTML = html;
+
+  // nav state
+  document.getElementById('prevBtn').disabled = (current===0);
+  document.getElementById('nextBtn').textContent = (current===13) ? "ส่งแบบสอบถาม" : "ถัดไป";
+  document.getElementById('warn').textContent = "";
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function save(key,val){
+  const num = current+1;
+  if(!answers[num]) answers[num]={};
+  answers[num][key]=val;
+  document.getElementById('warn').textContent = "";
+  updateProgress();
+}
+
+function pageComplete(){
+  const num=current+1, qs=BLOCKS[assignedBlock];
+  return qs.every(q=> answers[num] && answers[num][q.key]);
+}
+
+function next(){
+  if(!pageComplete()){
+    document.getElementById('warn').textContent = "กรุณาตอบให้ครบทั้ง 3 ข้อก่อนไปต่อ";
+    return;
+  }
+  if(current===13){ submitSurvey(); return; }
+  current++; renderMascot();
+}
+function prev(){ if(current>0){ current--; renderMascot(); } }
+
+function totalAnswered(){
+  let c=0; const qs=BLOCKS[assignedBlock];
+  for(let m=1;m<=14;m++) qs.forEach(q=>{ if(answers[m]&&answers[m][q.key]) c++; });
+  return c;
+}
+function updateProgress(){
+  const done=totalAnswered(), tot=14*3;
+  document.getElementById('progText').textContent = `ภาพที่ ${current+1} จาก 14 · ตอบแล้ว ${done}/${tot} ข้อ`;
+  document.getElementById('progBar').style.width=(done/tot*100)+"%";
+}
+
+function collectData(){
+  const qs=BLOCKS[assignedBlock]; const rows=[];
+  for(let m=1;m<=14;m++){
+    qs.forEach((q,i)=>{
+      rows.push({
+        participant: pid||"(ไม่ระบุ)",
+        block: assignedBlock,
+        mascot: m,
+        question_no: i+1,
+        question_key: q.key,
+        question_label: q.title,
+        score: (answers[m]&&answers[m][q.key])||""
+      });
+    });
+  }
+  return rows;
+}
+
+function submitSurvey(){
+  window._data = collectData();
+  document.getElementById('survey').classList.add('hidden');
+  document.getElementById('done').classList.remove('hidden');
+  window.scrollTo(0,0);
+  downloadCSV();
+}
+
+function downloadCSV(){
+  const rows = window._data || collectData();
+  const cols = Object.keys(rows[0]);
+  const esc = v => /[",\n]/.test(v) ? '"'+String(v).replace(/"/g,'""')+'"' : v;
+  let csv = "\uFEFF" + cols.join(",") + "\n";
+  rows.forEach(r=> csv += cols.map(c=>esc(r[c])).join(",")+"\n");
+  const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const a=document.createElement('a');
+  const stamp=new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+  a.href=URL.createObjectURL(blob);
+  a.download=`mascot_${(pid||"P").replace(/\s+/g,"_")}_block${assignedBlock}_${stamp}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+</script>
+</body>
+</html>
