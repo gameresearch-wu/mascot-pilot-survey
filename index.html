@@ -311,16 +311,15 @@ function sendToSheet(rows){
   const btn = document.getElementById('nextBtn');
   btn.disabled = true; btn.textContent = "กำลังส่งข้อมูล...";
   document.getElementById('warn').textContent = "";
+  // no-cors: Apps Script รับข้อมูลได้ แต่เบราว์เซอร์อ่าน response ไม่ได้
+  // จึงถือว่าส่งสำเร็จเมื่อ fetch ไม่ throw (เครือข่ายติดต่อได้)
   fetch(SHEET_ENDPOINT, {
     method: "POST",
+    mode: "no-cors",
     headers: {"Content-Type":"text/plain;charset=utf-8"},
     body: JSON.stringify({rows})
   })
-  .then(r => r.json())
-  .then(res => {
-    if(res && res.status === "ok"){ finishDone(); }
-    else { throw new Error(res && res.message ? res.message : "unknown"); }
-  })
+  .then(() => { finishDone(); })
   .catch(err => {
     btn.disabled = false; btn.textContent = "ส่งแบบสอบถาม";
     document.getElementById('warn').textContent =
